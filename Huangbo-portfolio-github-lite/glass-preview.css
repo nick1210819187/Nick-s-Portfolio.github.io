@@ -1,0 +1,65 @@
+/* Local review: a clear refracting lens; label contrast is sampled independently. */
+.dock { z-index: 3; border-color: #ffffff66; }
+.dock a { pointer-events: auto; }
+.has-liquidgl .dock, .has-liquidgl .over-hero .dock {
+  border-color: #ffffff70;
+  box-shadow: inset 0 1px 1px #ffffffb3, inset 0 -1px 1px #ffffff40;
+}
+.has-liquidgl .dock::before { display: none; }
+.has-liquidgl .dock::after, .has-liquidgl .over-hero .dock::after {
+  z-index: 0;
+  display: block;
+  background: linear-gradient(165deg, #ffffff1a, #ffffff00 48%, #ffffff09);
+  opacity: 1;
+}
+.has-liquidgl .dock-selection, .has-liquidgl .over-hero .dock-selection {
+  z-index: 1;
+  background: linear-gradient(145deg, #ffffff38, #ffffff0b 65%, #ffffff21);
+  box-shadow: inset 0 1px .5px #ffffffb3, inset 0 -1px .5px #ffffff47, 0 1px 5px #06142512;
+}
+.has-liquidgl .dock a,
+.has-liquidgl .dock a[aria-current="location"],
+.has-liquidgl .over-hero .dock a[aria-current="location"] {
+  z-index: 2;
+  color: var(--glass-ink, #ffffff);
+  text-shadow: var(--glass-text-shadow, 0 1px 3px #000000cc);
+}
+.has-liquidgl .dock a:hover { background: #ffffff0d; }
+
+/* Both floating bars share the fixed header, renderer, and refraction texture. */
+#site-header > .case-progress {
+  position: absolute;
+  z-index: 3;
+  inset: auto 0 calc(100% - 100dvh + 14px + max(12px, env(safe-area-inset-bottom)));
+  pointer-events: auto;
+}
+.has-liquidgl .case-progress {
+  isolation: isolate;
+  border-color: #ffffff70;
+  box-shadow: inset 0 1px 1px #ffffffb3, inset 0 -1px 1px #ffffff40;
+}
+.has-liquidgl .case-progress::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  border-radius: inherit;
+  pointer-events: none;
+  background: linear-gradient(165deg, #ffffff1a, #ffffff00 48%, #ffffff09);
+}
+.case-progress .case-count, .case-progress .case-thumbnails {
+  position: relative;
+  z-index: 2;
+  pointer-events: auto;
+}
+.has-liquidgl .case-count {
+  color: var(--glass-ink, #ffffff);
+  text-shadow: var(--glass-text-shadow, 0 1px 3px #000000cc);
+}
+.has-liquidgl .case-thumbnails button { background: #ffffff0d; border-color: #ffffff38; }
+.has-liquidgl .case-thumbnails button img { opacity: .8; }
+.has-liquidgl .case-thumbnails button:is(:hover, :focus-visible, [aria-current]) img { opacity: 1; }
+.has-liquidgl .case-thumbnails button[aria-current] {
+  border-color: #ffffff;
+  box-shadow: 0 0 0 1px #0c16254d, inset 0 0 0 1px #ffffff80;
+}
