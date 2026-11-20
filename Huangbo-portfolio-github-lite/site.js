@@ -15,7 +15,6 @@ const sections = [
 ];
 
 const header = document.querySelector('#site-header');
-if (header && !header.querySelector('.dock')) {
 header.innerHTML = `
   <nav class="dock" aria-label="页面导航">
     <span class="dock-selection" aria-hidden="true"></span>
@@ -79,8 +78,7 @@ if (caseContent) {
             <img src="${imagePath(page, 'assets/slide-thumbs')}" width="224" height="126" alt="" loading="lazy" decoding="async">
           </button>`).join('')}
         </div>
-  </nav>`;
-}
+      </nav>`;
 
     const intro = caseContent.querySelector('.case-intro');
     const deck = caseContent.querySelector('.case-slides');
