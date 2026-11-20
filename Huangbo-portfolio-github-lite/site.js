@@ -15,6 +15,7 @@ const sections = [
 const header = document.querySelector('#site-header');
 header.innerHTML = `
   <nav class="dock" aria-label="页面导航">
+    <span class="dock-selection" aria-hidden="true"></span>
     ${sections.map(([id, label]) => `<a href="${anchor(id)}" data-section="${id}">${label}</a>`).join('')}
   </nav>`;
 
@@ -184,12 +185,36 @@ if (caseContent) {
   });
 }
 
+const dock = header.querySelector('.dock');
+const dockSelection = dock.querySelector('.dock-selection');
 const navLinks = [...header.querySelectorAll('[data-section]')];
+function positionSelection(active = dock.querySelector('[aria-current="location"]')) {
+  if (!active) return;
+  dockSelection.style.width = active.offsetWidth + 'px';
+  dockSelection.style.transform = `translateX(${active.offsetLeft}px)`;
+  requestAnimationFrame(() => dock.classList.add('is-ready'));
+}
+new ResizeObserver(() => positionSelection()).observe(dock);
+dock.addEventListener('pointerover', event => {
+  const link = event.target.closest('[data-section]');
+  if (link && event.pointerType === 'mouse') positionSelection(link);
+});
+dock.addEventListener('pointerleave', () => positionSelection());
+dock.addEventListener('focusin', event => {
+  if (event.target.matches('[data-section]')) positionSelection(event.target);
+});
+dock.addEventListener('focusout', () => positionSelection());
+dock.addEventListener('pointermove', event => {
+  if (event.pointerType === 'mouse') {
+    dock.style.setProperty('--glass-x', (event.clientX - dock.getBoundingClientRect().left) + 'px');
+  }
+});
 function selectSection(id) {
   for (const link of navLinks) {
     if (link.dataset.section === id) link.setAttribute('aria-current', 'location');
     else link.removeAttribute('aria-current');
   }
+  positionSelection();
 }
 if (caseContent) {
   selectSection('work');
