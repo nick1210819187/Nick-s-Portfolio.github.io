@@ -5,16 +5,31 @@
   header.setAttribute('data-liquid-ignore', '');
   const progress = document.querySelector('.case-progress');
   if (progress) header.append(progress);
-  await document.fonts.ready;
   const firstImage = document.querySelector('.hero-portrait, .case-slides img');
-  if (firstImage) await firstImage.decode().catch(() => {});
+  // Let the first content paint before downloading the optional refraction renderer.
+  await Promise.race([
+    Promise.all([document.fonts.ready, firstImage?.decode().catch(() => {})]),
+    new Promise(resolve => setTimeout(resolve, 1500))
+  ]);
+  await new Promise(resolve => {
+    if ('requestIdleCallback' in window) requestIdleCallback(resolve, {timeout: 800});
+    else setTimeout(resolve, 0);
+  });
+  if (!window.liquidGL) await new Promise(resolve => {
+    const script = document.createElement('script');
+    script.src = 'assets/vendor/liquidGL-3.0.0-portfolio.js?v=fast-images-1';
+    script.fetchPriority = 'low';
+    script.onload = script.onerror = resolve;
+    document.head.append(script);
+  });
   if (!window.liquidGL) return;
   const reducedMotion = matchMedia('(prefers-reduced-motion: reduce)');
+  const touchDevice = matchMedia('(pointer: coarse)').matches;
   const mounted = liquidGL({
     target: '.dock, .case-progress',
     snapshot: 'body',
     content: false,
-    resolution: 1.5,
+    resolution: touchDevice ? 1 : 1.5,
     zIndex: 3,
     refraction: .19,
     aberration: .035,
@@ -26,7 +41,7 @@
     specular: true,
     reveal: 'none',
     tilt: false,
-    interaction: reducedMotion.matches ? 'none' : 'fluid',
+    interaction: reducedMotion.matches || touchDevice ? 'none' : 'fluid',
     interactionStrength: .1,
     interactionRadius: .8,
     interactionViscosity: .6,
@@ -40,6 +55,20 @@
   const lenses = (Array.isArray(mounted) ? mounted : [mounted]).filter(Boolean);
   const lens = lenses[0];
   if (!lens) return;
+  let snapshotTimer;
+  const refreshLoadedImages = () => {
+    clearTimeout(snapshotTimer);
+    snapshotTimer = setTimeout(async () => {
+      if (lens.renderer._destroyed) return;
+      if (lens.renderer._capturing) return refreshLoadedImages();
+      await lens.renderer.captureSnapshot();
+      queueMaterial();
+    }, 250);
+  };
+  document.addEventListener('load', event => {
+    if (event.target.tagName === 'IMG' && !header.contains(event.target)) refreshLoadedImages();
+  }, true);
+  document.fonts.ready.then(refreshLoadedImages);
   const updateTint = () => lens.setTint(header.classList.contains('over-hero')
     ? 'rgba(18, 26, 43, 0.04)'
     : 'rgba(242, 246, 252, 0.025)');
@@ -106,10 +135,13 @@
   syncExitMaterial();
   reducedMotion.addEventListener('change', () => {
     lenses.forEach(item => {
-      item.options.interaction = reducedMotion.matches ? 'none' : 'fluid';
+      item.options.interaction = reducedMotion.matches || touchDevice ? 'none' : 'fluid';
     });
   });
   window.addEventListener('pagehide', event => {
-    if (!event.persisted) lenses.forEach(item => item.destroy());
+    if (!event.persisted) {
+      clearTimeout(snapshotTimer);
+      lenses.forEach(item => item.destroy());
+    }
   });
 })();

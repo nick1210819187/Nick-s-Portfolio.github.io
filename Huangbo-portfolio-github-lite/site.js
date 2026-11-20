@@ -1,6 +1,8 @@
 const coverPages = {training: 3, service: 41, buddy: 22, mis: 53};
 const imagePath = (page, folder = 'assets') => folder + '/hb-' + String(page).padStart(2, '0') + '.webp';
 const caseLink = project => 'case.html?id=' + project.id;
+const emptySlide = 'data:image/svg+xml,%3Csvg xmlns="http://www.w3.org/2000/svg" width="1920" height="1080"/%3E';
+const workImageSizes = '(max-width: 700px) calc(100vw - 36px), (max-width: 1160px) calc(100vw - 80px), 1080px';
 const caseContent = document.querySelector('#case-content');
 const anchor = id => (caseContent ? 'index.html#' : '#') + id;
 const sections = [
@@ -13,19 +15,25 @@ const sections = [
 ];
 
 const header = document.querySelector('#site-header');
+if (header && !header.querySelector('.dock')) {
 header.innerHTML = `
   <nav class="dock" aria-label="页面导航">
     <span class="dock-selection" aria-hidden="true"></span>
     ${sections.map(([id, label]) => `<a href="${anchor(id)}" data-section="${id}">${label}</a>`).join('')}
   </nav>`;
 
-function slideImage(page, caption, loading = 'lazy') {
-  return `<img src="${imagePath(page)}" alt="${caption}" width="1920" height="1080" loading="${loading}" decoding="async">`;
+function slideImage(page, caption, loading = 'lazy', sizes = 'calc(100vw - 20px)') {
+  const variants = [640, 1280].map(width => `assets/responsive/hb-${String(page).padStart(2, '0')}-${width}.webp ${width}w`).join(', ');
+  const srcset = `${variants}, ${imagePath(page)} ${[3, 4, 5, 8, 10, 11, 12, 13, 14, 17, 20, 32, 33, 34, 35, 36, 37, 38, 47, 50].includes(Number(page)) ? 1920 : 2400}w`;
+  const source = loading === 'eager'
+    ? `src="${imagePath(page)}" srcset="${srcset}" fetchpriority="high"`
+    : `src='${emptySlide}' data-src="${imagePath(page)}" data-srcset="${srcset}"`;
+  return `<img ${source} sizes="${sizes}" alt="${caption}" width="1920" height="1080" decoding="async">`;
 }
 
 function imageButton(page, caption) {
   return `<button type="button" class="image-button" data-sheet="${page}" aria-label="放大图片：${caption}">
-    ${slideImage(page, caption)}
+    ${slideImage(page, caption, 'lazy', '(max-width: 700px) calc(100vw - 36px), (max-width: 1160px) calc(50vw - 50px), 530px')}
   </button>`;
 }
 
@@ -71,7 +79,8 @@ if (caseContent) {
             <img src="${imagePath(page, 'assets/slide-thumbs')}" width="224" height="126" alt="" loading="lazy" decoding="async">
           </button>`).join('')}
         </div>
-      </nav>`;
+  </nav>`;
+}
 
     const intro = caseContent.querySelector('.case-intro');
     const deck = caseContent.querySelector('.case-slides');
@@ -121,14 +130,29 @@ if (caseContent) {
     const phones = deck.querySelectorAll('.case-phone video');
     if (phones.length) {
       const visibleFraction = .25;
+      const visiblePhones = new Set();
+      let mediaReady = false;
+      const playVisiblePhones = () => {
+        if (!mediaReady || reducedMotion.matches || navigator.connection?.saveData) return;
+        visiblePhones.forEach(video => video.play().catch(() => {}));
+      };
+      // Phone demos wait until the initial page assets have finished loading.
+      const enablePhoneDemos = () => setTimeout(() => {
+        mediaReady = true;
+        playVisiblePhones();
+      }, 1200);
+      if (document.readyState === 'complete') enablePhoneDemos();
+      else window.addEventListener('load', enablePhoneDemos, {once: true});
       const playback = new IntersectionObserver(entries => {
         for (const entry of entries) {
-          if (entry.intersectionRatio >= visibleFraction && !reducedMotion.matches) {
-            entry.target.play().catch(() => {});
+          if (entry.intersectionRatio >= visibleFraction) {
+            visiblePhones.add(entry.target);
           } else {
+            visiblePhones.delete(entry.target);
             entry.target.pause();
           }
         }
+        playVisiblePhones();
       }, {threshold: visibleFraction});
       phones.forEach(video => {
         video.addEventListener('playing', () => video.classList.add('is-playing'), {once: true});
@@ -155,7 +179,7 @@ if (caseContent) {
           <a class="pill primary case-button" href="${caseLink(project)}" aria-label="查看案例：${project.title}">查看作品 <span aria-hidden="true">↗</span></a>
         </div>
         <a class="work-cover" href="${caseLink(project)}" aria-label="进入${project.title}案例">
-          <img src="${imagePath(coverPages[project.id])}" alt="${project.title}的作品集封面" width="1600" height="900" loading="lazy" decoding="async">
+          ${slideImage(coverPages[project.id], project.title + '的作品集封面', 'lazy', workImageSizes)}
         </a>
       </div>
     </article>`).join('');
@@ -183,6 +207,26 @@ if (caseContent) {
       }
     });
   });
+}
+
+// A short preload margin keeps the next image ready without downloading the whole portfolio.
+function loadDeferredImage(image) {
+  if (image.dataset.srcset) image.srcset = image.dataset.srcset;
+  image.src = image.dataset.src;
+  delete image.dataset.src;
+  delete image.dataset.srcset;
+}
+if ('IntersectionObserver' in window) {
+  const imageObserver = new IntersectionObserver(entries => {
+    for (const entry of entries) {
+      if (!entry.isIntersecting) continue;
+      loadDeferredImage(entry.target);
+      imageObserver.unobserve(entry.target);
+    }
+  }, {rootMargin: '600px 0px'});
+  document.querySelectorAll('img[data-src]').forEach(image => imageObserver.observe(image));
+} else {
+  document.querySelectorAll('img[data-src]').forEach(loadDeferredImage);
 }
 
 const dock = header.querySelector('.dock');

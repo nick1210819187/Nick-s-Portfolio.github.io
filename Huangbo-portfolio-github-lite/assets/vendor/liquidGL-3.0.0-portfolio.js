@@ -1071,10 +1071,9 @@
       const layers = style.backgroundImage;
       if (layers && layers !== "none") layerUrls(layers).forEach(loadImage);
       const tag = el.tagName;
-      if (tag === "IMG") {
-        const src = el.currentSrc || el.src;
-        if (src && !usableDomImage(el)) loadImage(src);
-      } else if (tag === "svg") {
+      // Portfolio patch: images are drawn only after the browser loads them.
+      // Creating another Image here bypasses lazy loading and delays the lens.
+      if (tag === "svg") {
         svgToImage(el);
       }
     }
