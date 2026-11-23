@@ -15,15 +15,16 @@ const sections = [
 ];
 
 const header = document.querySelector('#site-header');
-header.innerHTML = `
+if (!header.querySelector('.dock')) header.innerHTML = `
   <nav class="dock" aria-label="页面导航">
     <span class="dock-selection" aria-hidden="true"></span>
     ${sections.map(([id, label]) => `<a href="${anchor(id)}" data-section="${id}">${label}</a>`).join('')}
   </nav>`;
 
 function slideImage(page, caption, loading = 'lazy', sizes = 'calc(100vw - 20px)') {
-  const variants = [640, 1280].map(width => `assets/responsive/hb-${String(page).padStart(2, '0')}-${width}.webp ${width}w`).join(', ');
-  const srcset = `${variants}, ${imagePath(page)} ${[3, 4, 5, 8, 10, 11, 12, 13, 14, 17, 20, 32, 33, 34, 35, 36, 37, 38, 47, 50].includes(Number(page)) ? 1920 : 2400}w`;
+  const variants = [640, 960, 1280, 1600].map(width => `assets/responsive/hb-${String(page).padStart(2, '0')}-${width}.webp ${width}w`).join(', ');
+  const preview = sizes !== 'calc(100vw - 20px)';
+  const srcset = preview ? variants : `${variants}, ${imagePath(page)} ${[3, 4, 5, 8, 10, 11, 12, 13, 14, 17, 20, 32, 33, 34, 35, 36, 37, 38, 47, 50].includes(Number(page)) ? 1920 : 2400}w`;
   const source = loading === 'eager'
     ? `src="${imagePath(page)}" srcset="${srcset}" fetchpriority="high"`
     : `src='${emptySlide}' data-src="${imagePath(page)}" data-srcset="${srcset}"`;

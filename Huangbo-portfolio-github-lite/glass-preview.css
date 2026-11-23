@@ -1,6 +1,19 @@
 /* Local review: a clear refracting lens; label contrast is sampled independently. */
 .dock { z-index: 3; border-color: #ffffff66; }
 .dock a { pointer-events: auto; }
+/* Keep both controls visible and usable while the refraction snapshot is pending. */
+html:not(.has-liquidgl) .dock,
+html:not(.has-liquidgl) .case-progress {
+  opacity: 1 !important;
+  pointer-events: auto !important;
+  background: linear-gradient(145deg, #ffffffe8, #edf1f5d9) !important;
+  -webkit-backdrop-filter: blur(18px) saturate(180%) !important;
+  backdrop-filter: blur(18px) saturate(180%) !important;
+}
+html:not(.has-liquidgl) .over-hero .dock,
+html:not(.has-liquidgl) .case-progress {
+  background: linear-gradient(145deg, #253148e8, #121923d9) !important;
+}
 .has-liquidgl .dock, .has-liquidgl .over-hero .dock {
   border-color: #ffffff70;
   box-shadow: inset 0 1px 1px #ffffffb3, inset 0 -1px 1px #ffffff40;

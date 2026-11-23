@@ -17,7 +17,7 @@
   });
   if (!window.liquidGL) await new Promise(resolve => {
     const script = document.createElement('script');
-    script.src = 'assets/vendor/liquidGL-3.0.0-portfolio.js?v=fast-images-1';
+    script.src = 'assets/vendor/liquidGL-3.0.0-portfolio.js?v=fast-images-2';
     script.fetchPriority = 'low';
     script.onload = script.onerror = resolve;
     document.head.append(script);
