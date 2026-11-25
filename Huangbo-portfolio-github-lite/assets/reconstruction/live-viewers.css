@@ -1,0 +1,18 @@
+.case-reconstruction .live-home-view,
+.case-reconstruction .framework-page-canvas,
+.case-reconstruction .p4-native-stage{position:relative;overflow:hidden}
+.case-reconstruction .native-frame{position:absolute;left:0;top:0;z-index:1;display:block;border:0;background:#fff;opacity:0;visibility:hidden;transform-origin:0 0}
+.case-reconstruction [data-native-ready="true"]>.native-frame{opacity:1;visibility:visible}
+.case-reconstruction .native-status{position:absolute;z-index:2;bottom:10px;left:10px;max-width:calc(100% - 120px);padding:4px 9px;border-radius:5px;background:#fffffff2;color:#5c6875;font:12px/1.6 -apple-system,BlinkMacSystemFont,'PingFang SC',sans-serif;pointer-events:none}
+.case-reconstruction .native-status:empty{display:none}
+.case-reconstruction .native-retry{position:absolute;z-index:3;right:10px;bottom:10px;padding:5px 12px;border:1px solid #d5dbe3;border-radius:6px;background:#fff;color:#273748;font:12px/1.6 -apple-system,BlinkMacSystemFont,'PingFang SC',sans-serif;cursor:pointer}
+.case-reconstruction .native-retry[hidden]{display:none}
+.case-reconstruction .p4-native-stage>[role="status"].p4-native-loading{display:none}
+.case-reconstruction #p4-native-stage{overflow:hidden!important}
+
+.case-reconstruction .framework-catalog-head{display:block;height:60px;min-height:60px;padding:16px 14px}
+.case-reconstruction .framework-catalog-scroll{top:60px}
+@media(max-width:780px){.case-reconstruction .framework-catalog-head{height:auto;min-height:0;padding:12px}.case-reconstruction .framework-catalog-scroll{top:auto}}
+
+.case-reconstruction:has(.native-frame:focus) .case-progress{transform:translateY(calc(100% + 96px));visibility:hidden;pointer-events:none}
+@media(max-width:700px){.case-reconstruction .live-home-view:has(.native-frame){height:min(680px,80svh)!important;aspect-ratio:auto}.case-reconstruction .live-home-view:has(.native-frame)>.demo-static-home{height:100%;object-fit:contain}}

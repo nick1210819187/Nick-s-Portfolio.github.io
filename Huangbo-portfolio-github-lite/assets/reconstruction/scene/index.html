@@ -1,0 +1,57 @@
+<!doctype html><html lang="zh-CN"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>FusionOne Center · 可交互首页</title><script src="assets.js?v=official-final"></script><script src="loader.js" defer></script><script src="bridge.js" defer></script></head><body>
+    <div id="app"><header class="xd-topbar" aria-label="FusionOne Center 顶部导航"></header><aside class="xd-rail" aria-label="产品导航"></aside>
+
+
+      <main id="workspace" aria-label="算力数字孪生">
+        <div class="topology-home">
+          <section id="topology-stage" class="topology-stage" aria-label="集群拓扑">
+          <canvas id="scene" aria-label="AI 服务器集群交互场景"></canvas>
+
+          <div id="tooltip" class="tooltip" role="status"></div>
+          <div id="node-labels" class="node-labels" aria-hidden="true"></div>
+          <div id="cluster-picker" class="cluster-picker" hidden></div>
+          <div class="visually-hidden" id="scene-status" role="status"></div>
+          <div class="loading" id="loading"><span></span><p>正在初始化数字孪生场景</p></div>
+          </section>
+          <aside id="home-insights" class="home-insights" aria-label="首页信息"></aside>
+        </div>
+      <div id="hardware-drawer-host"></div>
+      <div id="hardware-drawer" class="hardware-drawer">
+        <canvas id="drawer-scene" aria-label="服务器硬件爆炸视图"></canvas>
+        <div class="drawer-telemetry">
+          <span><i id="drawer-status-dot" class="status-dot running"></i><b id="drawer-status">运行中</b></span>
+          <span><i id="drawer-gpu-label" class="metric-label">GPU</i> <b id="drawer-gpus">32</b></span>
+          <span>负载 <b id="drawer-load">89%</b></span>
+          <span>温度 <b id="drawer-temp">72°C</b></span>
+        </div>
+        <div id="drawer-part-status" class="drawer-part-status" aria-label="算力部件状态"></div>
+        <p id="xpark-selection" class="xpark-selection" role="status" hidden></p>
+        <output id="teardown-phase" class="teardown-phase" hidden></output>
+        <section id="anatomy-panel" class="anatomy-panel" aria-label="结构分层" hidden>
+          <div id="anatomy-tabs" class="anatomy-tabs"></div>
+          <div aria-live="polite"><h3 id="anatomy-title"></h3><p id="anatomy-readout"></p></div>
+        </section>
+      </div>
+
+      <div id="component-labels" class="component-labels" aria-hidden="true"></div>
+
+      <aside id="detail-panel" class="detail-panel" aria-live="polite">
+        <div class="panel-accent"></div>
+        <div id="close-panel" class="icon-button"></div>
+        <p id="detail-eyebrow" class="eyebrow">加速卡实时状态</p>
+        <h2 id="gpu-name">GPU 03</h2>
+        <div class="detail-status"><i id="gpu-status-dot" class="status-dot running"></i><span>运行状态</span><strong id="gpu-status">正常</strong></div>
+        <dl>
+          <div><dt id="gpu-util-label">GPU 利用率</dt><dd id="gpu-util">86%</dd></div>
+          <div><dt id="gpu-memory-label">显存占用</dt><dd id="gpu-memory">72 GB / 80 GB</dd></div>
+          <div><dt>核心温度</dt><dd id="gpu-temp">62°C</dd></div>
+          <div><dt id="gpu-power-label">实时功耗</dt><dd id="gpu-power">540 W</dd></div>
+        </dl>
+        <div id="gpu-progress"></div>
+        <p id="gpu-message" class="panel-footnote">硬件遥测数据实时更新</p>
+      </aside>
+
+      </main>
+      <section class="demo-controls" aria-label="悬浮演示控制"></section>
+    </div>
+  </body></html>

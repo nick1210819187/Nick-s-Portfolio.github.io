@@ -448,6 +448,13 @@ figcaption { color: #424d62; margin-top: 10px; font-size: 14px; }
   color: #fff;
   box-shadow: 0 6px 24px #0002;
   backdrop-filter: blur(16px);
+  transition: transform .22s ease, visibility .22s;
+}
+.case-progress[data-visible="false"] {
+  /* Move the shared refraction lens offscreen along with its DOM content. */
+  transform: translateY(calc(100% + 96px));
+  visibility: hidden;
+  pointer-events: none !important;
 }
 .case-count { flex: 0 0 44px; font-size: 12px; font-variant-numeric: tabular-nums; text-align: center; }
 .case-thumbnails {

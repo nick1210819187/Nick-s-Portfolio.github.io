@@ -1,0 +1,4 @@
+(async()=>{
+ const text=async(path)=>{if(!('DecompressionStream'in window)){const r=await fetch(path+'?v=4');if(!r.ok)throw Error('加载失败');return r.text()}const r=await fetch(path+'.gz?v=4');if(!r.ok)throw Error('加载失败');return new Response(r.body.pipeThrough(new DecompressionStream('gzip'))).text()};
+ try{const[css,patches,main]=await Promise.all([text('styles.css'),text('addons.js'),text('block-05.js')]);const style=document.createElement('style');style.textContent=css;document.head.append(style);const patch=document.createElement('script');patch.textContent=patches;document.body.append(patch);const url=URL.createObjectURL(new Blob([main],{type:'text/javascript'}));try{await import(url)}finally{URL.revokeObjectURL(url)}}catch(error){parent.postMessage({type:'portfolio-demo-error',kind:'demokit'},location.origin);console.error(error)}
+})();

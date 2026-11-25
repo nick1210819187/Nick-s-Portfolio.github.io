@@ -1,6 +1,6 @@
 const coverPages = {training: 3, service: 41, buddy: 22, mis: 53};
 const imagePath = (page, folder = 'assets') => folder + '/hb-' + String(page).padStart(2, '0') + '.webp';
-const caseLink = project => 'case.html?id=' + project.id;
+const caseLink = project => project.href || 'case.html?id=' + project.id;
 const emptySlide = 'data:image/svg+xml,%3Csvg xmlns="http://www.w3.org/2000/svg" width="1920" height="1080"/%3E';
 const workImageSizes = '(max-width: 700px) calc(100vw - 36px), (max-width: 1160px) calc(100vw - 80px), 1080px';
 const caseContent = document.querySelector('#case-content');
@@ -10,8 +10,7 @@ const sections = [
   ['experience', '经历'],
   ['work', '作品'],
   ['notes', 'AI 实践'],
-  ['about', '关于'],
-  ['contact', '联系']
+  ['about', '联系']
 ];
 
 const header = document.querySelector('#site-header');
@@ -57,10 +56,11 @@ function renderCaseSlide(page, caption, motion, loading) {
 }
 
 if (caseContent) {
-  const project = projects.find(item => item.id === new URLSearchParams(location.search).get('id'));
+  const project = projects.find(item => item.id === (caseContent.dataset.project || new URLSearchParams(location.search).get('id')));
   if (project) {
     document.title = project.title + ' — 黄博 NICK';
     const next = projects[(projects.indexOf(project) + 1) % projects.length];
+    if (!caseContent.hasAttribute('data-static-case')) {
     const slides = [[coverPages[project.id], project.title], ...project.slides];
     caseContent.innerHTML = `
       <div class="case-reader case-intro">
@@ -72,7 +72,7 @@ if (caseContent) {
         ${slides.map(([page, caption], index) => renderCaseSlide(page, caption, project.phoneMotion?.[page], index === 0 ? 'eager' : 'lazy')).join('')}
       </div>
       <div class="wrap next-case"><a href="${caseLink(next)}"><span>下一个作品</span><strong>${next.title} <span aria-hidden="true">↗</span></strong></a></div>
-      <nav class="case-progress" aria-label="作品页码导航">
+      <nav class="case-progress" aria-label="作品页码导航" data-visible="false" aria-hidden="true" inert>
         <span class="case-count"></span>
         <div class="case-thumbnails">
           ${slides.map(([page, caption], index) => `<button type="button" aria-label="第 ${index + 1} 页：${caption}">
@@ -80,6 +80,7 @@ if (caseContent) {
           </button>`).join('')}
         </div>
       </nav>`;
+    }
 
     const intro = caseContent.querySelector('.case-intro');
     const deck = caseContent.querySelector('.case-slides');
@@ -87,6 +88,7 @@ if (caseContent) {
     const track = caseContent.querySelector('.case-thumbnails');
     const thumbnails = [...track.children];
     const counter = caseContent.querySelector('.case-count');
+    const progress = caseContent.querySelector('.case-progress');
     const reducedMotion = matchMedia('(prefers-reduced-motion: reduce)');
     const readingLine = () => Math.min(innerHeight * .5, deck.offsetTop + pages[0].offsetHeight / 2);
     let currentPage = -1;
@@ -96,6 +98,12 @@ if (caseContent) {
       progressFrame = 0;
       const introBottom = intro.getBoundingClientRect().bottom;
       header.classList.toggle('over-hero', introBottom >= 45);
+      const visible = scrollY > 80;
+      if (progress.dataset.visible !== String(visible)) {
+        progress.dataset.visible = String(visible);
+        progress.inert = !visible;
+        progress.setAttribute('aria-hidden', String(!visible));
+      }
       const line = readingLine();
       const firstBelow = pages.findIndex(page => page.getBoundingClientRect().bottom >= line);
       const index = firstBelow === -1 ? pages.length - 1 : firstBelow;
@@ -113,7 +121,7 @@ if (caseContent) {
 
     thumbnails.forEach((button, index) => button.addEventListener('click', () => {
       const page = pages[index];
-      const topOffset = page.classList.contains('case-slide-motion') ? header.getBoundingClientRect().bottom + 12 : deck.offsetTop;
+      const topOffset = (caseContent.hasAttribute('data-static-case') || page.classList.contains('case-slide-motion')) ? header.getBoundingClientRect().bottom + 12 : deck.offsetTop;
       window.scrollTo({
         top: scrollY + page.getBoundingClientRect().top - topOffset,
         behavior: reducedMotion.matches ? 'instant' : 'smooth'
@@ -178,7 +186,7 @@ if (caseContent) {
           <a class="pill primary case-button" href="${caseLink(project)}" aria-label="查看案例：${project.title}">查看作品 <span aria-hidden="true">↗</span></a>
         </div>
         <a class="work-cover" href="${caseLink(project)}" aria-label="进入${project.title}案例">
-          ${slideImage(coverPages[project.id], project.title + '的作品集封面', 'lazy', workImageSizes)}
+          ${project.cover ? `<img src="${project.cover}" srcset="${project.coverSrcset}" sizes="${workImageSizes}" width="1600" height="900" alt="${project.title}的作品集封面" loading="lazy" decoding="async">` : slideImage(coverPages[project.id], project.title + '的作品集封面', 'lazy', workImageSizes)}
         </a>
       </div>
     </article>`).join('');

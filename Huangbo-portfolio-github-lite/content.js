@@ -1,5 +1,18 @@
 const projects = [
   {
+    id: "reconstruction",
+    title: "AI 驱动的算力平台重构",
+    en: "AI INFRASTRUCTURE REDESIGN",
+    year: "2026",
+    audience: "B 端",
+    role: "算力业务体验设计主管",
+    summary: "主导 FusionOne Center 体验重构，以 3D 软硬联动、可复用框架与设计 Skill，将设计决策推进到可运行的 HTML。",
+    href: "reconstruction.html",
+    cover: "assets/reconstruction/cover-1280.webp",
+    coverSrcset: "assets/reconstruction/cover-640.webp 640w, assets/reconstruction/cover-960.webp 960w, assets/reconstruction/cover-1280.webp 1280w, assets/reconstruction/cover-1600.webp 1600w",
+    slides: []
+  },
+  {
     id: "training",
     title: "AI 销售培训",
     en: "AI SALES TRAINING",
